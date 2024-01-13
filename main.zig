@@ -271,7 +271,7 @@ pub fn main() !void {
                         PlayState.Init =>{
                             time_started = @floatCast(ray.GetTime());
                             play_state = PlayState.Play;
-                            ray.SetMusicVolume(music, 3);
+                            ray.SetMusicVolume(music, 2);
                             ray.PlayMusicStream(music);
                         },
                         PlayState.Play => {
@@ -280,14 +280,16 @@ pub fn main() !void {
                             if (time_excused < 0){
                                 play_state = PlayState.Over;
                                 ray.PlaySound(fail_sound);
-                                ray.SetMusicVolume(music, 1.5);
+                                ray.SetMusicVolume(music, 1);
                             }
 
+                            buf = std.mem.zeroes([100]u8);
                             const score_txt = try std.fmt.bufPrint(&buf, "{d:.01}", .{score});
 
                             ray.DrawText("SCORE:", 60, 40, fsz, ray.RAYWHITE);
                             ray.DrawText(score_txt.ptr, 60, 80, fsz, ray.RAYWHITE);
 
+                            buf = std.mem.zeroes([100]u8);
                             const time_txt = try std.fmt.bufPrint(&buf, "{d:.01}", .{time_excused});
 
                             ray.DrawText("TIME BOUGHT:", 60, 160, fsz, ray.RAYWHITE);
@@ -347,6 +349,7 @@ pub fn main() !void {
                         PlayState.Over => {
                             ray.UpdateMusicStream(music);
 
+                            buf = std.mem.zeroes([100]u8);
                             const score_txt = try std.fmt.bufPrint(&buf, "{d:.01}", .{score});
 
                             ray.DrawText("SCORE:", 60, 40, fsz, ray.RAYWHITE);
@@ -387,7 +390,7 @@ pub fn main() !void {
 
 pub fn fail(score: *f32, time_excused: *f32, time_to_excuse: *f32) void {
     score.* -= time_to_excuse.* / 2;
-    time_excused.* -= time_to_excuse.* / 2;
+    time_excused.* -= time_to_excuse.* * 5;
 }
 
 pub fn succ(day: *u32, score: *f32, time_excused: *f32, time_to_excuse: *f32) void {
